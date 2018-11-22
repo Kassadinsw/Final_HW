@@ -1,0 +1,60 @@
+#version 330 core
+
+struct Light
+{
+	bool enable;
+	vec3 attenuation;
+	vec4 position;
+	vec4 color;
+};
+
+uniform mat4 view_matrix;
+
+uniform vec4 global_ambient_light;
+
+uniform vec4 diffuse_reflectivity;
+uniform vec4 specular_reflectivity;
+uniform float shininess;
+
+#define NUM_LIGHTS 3
+uniform Light lights[NUM_LIGHTS];
+
+in vec3 vs_fs_N;
+in vec3 vs_fs_P;
+
+out vec4 frag_color;
+
+void main(void)
+{
+	vec3 N=normalize(vs_fs_N);
+	vec3 V=-normalize(vs_fs_P);
+
+	vec3 L, R;
+	vec4 color=diffuse_reflectivity*global_ambient_light;
+	for (int i=0; i<NUM_LIGHTS; ++i)
+	{
+		if (!lights[i].enable) continue;
+
+		float f=1.0f;
+		vec4 LL=view_matrix*lights[i].position;
+		if (lights[i].position.w==0.0) L=normalize(LL.xyz);
+		else
+		{
+			L=LL.xyz-vs_fs_P;
+			float d=length(L);
+			L/=d;
+			f=1.0/(lights[i].attenuation.x
+				+lights[i].attenuation.y*d
+				+lights[i].attenuation.z*d*d);
+		}
+		R=reflect(-L, N);
+
+		float diffuse_factor=max(dot(N, L), 0.0);
+		float specular_factor=pow(max(dot(V, R), 0.0), shininess);
+
+		color+=(diffuse_factor*diffuse_reflectivity
+			+specular_factor*specular_reflectivity)*f*lights[i].color;
+	}
+
+	frag_color=color;
+}

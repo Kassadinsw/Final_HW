@@ -1,0 +1,13 @@
+﻿  main.cpp
+f:\vs2017\final_hw\include\vec.h(23): warning C4305: “初始化”: 从“double”到“float”截断
+f:\vs2017\final_hw\include\vec.h(141): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\vec.h(268): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\vec.h(409): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(673): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(674): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(675): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(696): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(698): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(701): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+f:\vs2017\final_hw\include\mat.h(718): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+  Final_HW.vcxproj -> F:\VS2017\Final_HW\Debug\Final_HW.exe

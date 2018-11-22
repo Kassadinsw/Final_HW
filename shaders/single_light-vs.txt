@@ -1,0 +1,39 @@
+#version 330 core
+
+layout (location=0) in vec4 position;
+layout (location=1) in vec3 normal;
+
+uniform mat4 model_matrix;
+uniform mat3 normal_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+uniform vec4 global_ambient_light;
+
+uniform vec4 light_position;
+uniform vec4 light_color;
+
+uniform vec4 diffuse_reflectivity;
+uniform vec4 specular_reflectivity;
+uniform float shininess;
+
+out vec4 vs_fs_color;
+
+void main(void)
+{
+	vec4 P_eye=(view_matrix*(model_matrix*position));
+	gl_Position=projection_matrix*P_eye;
+	vec4 NN=view_matrix*vec4(normal_matrix*normal, 0.0);
+	vec4 LL=view_matrix*light_position;
+	vec3 N=normalize(NN.xyz);
+	vec3 L=normalize(LL.xyz);
+	vec3 V=-normalize(P_eye.xyz);
+	vec3 R=reflect(-L, N);
+
+	float diffuse_factor=max(dot(N, L), 0.0);
+	float specular_factor=pow(max(dot(V, R), 0.0), shininess);
+
+	vs_fs_color=diffuse_reflectivity*global_ambient_light
+		+(diffuse_factor*diffuse_reflectivity
+		+specular_factor*specular_reflectivity)*light_color;
+}

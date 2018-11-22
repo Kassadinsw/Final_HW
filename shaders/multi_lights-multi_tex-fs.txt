@@ -1,0 +1,79 @@
+#version 330 core
+
+struct Light
+{
+	bool enable;
+	vec3 attenuation;
+	vec4 position;
+	vec4 color;
+};
+
+uniform mat4 view_matrix;
+
+uniform vec4 global_ambient_light;
+
+uniform vec4 diffuse_reflectivity;
+uniform vec4 specular_reflectivity;
+uniform float shininess;
+
+#define NUM_LIGHTS 3
+uniform Light lights[NUM_LIGHTS];
+
+uniform bool enable_tex_map;
+uniform sampler2D tex_map;
+uniform sampler2D detail_map;
+
+in vec3 vs_fs_N;
+in vec3 vs_fs_P;
+in vec2 vs_fs_texcoord;
+
+out vec4 frag_color;
+
+void main(void)
+{
+	vec4 tex_color;
+	if (enable_tex_map)
+	{
+		vec4 tex_color1=texture(tex_map, vs_fs_texcoord);
+		//vec4 tex_color2=texture(detail_map, vs_fs_texcoord);
+		//tex_color=mix(tex_color1, tex_color2, 0.2);
+		tex_color = tex_color1;
+	}
+	else
+		tex_color=vec4(1.0);
+
+	vec3 N=normalize(vs_fs_N);
+	vec3 V=-normalize(vs_fs_P);
+
+	vec3 L, R;
+	vec4 color1=diffuse_reflectivity*global_ambient_light;
+	vec4 color2=vec4(0.0, 0.0, 0.0, 1.0);
+	for (int i=0; i<NUM_LIGHTS; ++i)
+	{
+		if (!lights[i].enable) continue;
+
+		float f=1.0f;
+		vec4 LL=view_matrix*lights[i].position;
+		if (lights[i].position.w==0.0) L=normalize(LL.xyz);
+		else
+		{
+			L=LL.xyz-vs_fs_P;
+			float d=length(L);
+			L/=d;
+			f=1.0/(lights[i].attenuation.x
+				+lights[i].attenuation.y*d
+				+lights[i].attenuation.z*d*d);
+		}
+		R=reflect(-L, N);
+
+		float diffuse_factor=max(dot(N, L), 0.0);
+		float specular_factor=pow(max(dot(V, R), 0.0), shininess);
+
+		color1+=diffuse_factor*diffuse_reflectivity
+			*f*lights[i].color;
+		color2+=specular_factor*specular_reflectivity
+			*f*lights[i].color;
+	}
+
+	frag_color=color1*tex_color+color2;
+}

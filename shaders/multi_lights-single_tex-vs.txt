@@ -1,0 +1,25 @@
+#version 330 core
+
+layout (location=0) in vec4 position;
+layout (location=1) in vec3 normal;
+layout (location=2) in vec2 texcoord;
+
+uniform mat4 model_matrix;
+uniform mat3 normal_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+out vec3 vs_fs_N;
+out vec3 vs_fs_P;
+out vec2 vs_fs_texcoord;
+
+void main(void)
+{
+	vec4 P_eye=(view_matrix*(model_matrix*position));
+	vs_fs_P=P_eye.xyz;
+	gl_Position=projection_matrix*P_eye;
+	vec4 NN=view_matrix*vec4(normal_matrix*normal, 0.0);
+	vs_fs_N=NN.xyz;
+
+	vs_fs_texcoord=texcoord;
+}
